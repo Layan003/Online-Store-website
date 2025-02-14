@@ -6,7 +6,7 @@ import "../styles/Navbar.css";
 export default function Navbar() {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
-    <section className="flex justify-between shadow-md items-center">
+    <section className="relative shadow-md flex justify-between items-center z-10">
       <div>LOGO</div>
       <button
         onClick={() => setIsExpanded(!isExpanded)}

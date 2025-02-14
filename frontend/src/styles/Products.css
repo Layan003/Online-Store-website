@@ -1,0 +1,22 @@
+.product {
+    background-color: var(--white);
+    border-radius: 6px;
+}
+
+.product img {
+    border-radius: 6px 6px 0px 0px;
+}
+
+.product button {
+    border-radius: 6px;
+}
+
+.product button:hover {
+    color: gray;
+    transition: 0.5s;
+}
+
+.product:hover {
+    transform: scale(1.03);
+    transition: 0.5s;
+}

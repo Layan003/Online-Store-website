@@ -2,8 +2,9 @@
 
 
 :root {
-    --Blue: #218DFA;
-    --white: #F5F7FB
+    --blue: #218DFA;
+    --white: #F5F7FB;
+    --black: #212121;
 }
 
 section {

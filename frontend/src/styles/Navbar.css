@@ -58,15 +58,32 @@
         right: 0;
         min-height: fit-content;
         width: 250px;
-        /* box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.5); */
         padding-top: 3.5rem;
         background-color: var(--white);
-
     }
 
     .nav-items.expanded {
         display: flex;
     }
+
+    .icon-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .cart-count {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate(70%, 20%);
+    }
+
+    .icon-container:hover,
+    .nav-items li:hover {
+        transform: scale(1.05);
+    }
+
+
 
 }
 
