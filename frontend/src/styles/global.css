@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+
+:root {
+    --Blue: #218DFA;
+    --white: #F5F7FB
+}
+
+section {
+    padding: 1rem 4rem;
+    background-color: var(--white);
+
+}
+
+
+
+@media (max-width: 640px) {
+    section {
+        padding: 1rem;
+    }
+}
