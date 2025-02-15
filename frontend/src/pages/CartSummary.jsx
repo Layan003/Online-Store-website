@@ -2,7 +2,6 @@ import React from "react";
 import "../styles/Cart.css";
 import { useNavigate } from "react-router-dom";
 
-
 const img =
   "https://images.unsplash.com/photo-1739477021967-e14dc3938e56?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 const items = [
@@ -17,10 +16,10 @@ const items = [
   { name: "hahaha", description: "lorumldfnaldfnlnf", price: 32 },
 ];
 export default function CartSummary() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
-    <section className="cart-section flex justify-center m-auto bg-gray-800 gap-6">
-      <div className="shadow-lg bg-white border rounded-lg h-fit w-fit m-auto">
+    <section className="cart-section flex m-auto items-center w-fit gap-5">
+      <div className="shadow-lg bg-white border rounded-lg h-fit">
         {/*  */}
         <div className="flex p-4 cart-item">
           <div className="img-container">
@@ -146,7 +145,7 @@ export default function CartSummary() {
         {/*  */}
       </div>
       {/* order info */}
-      <div className="bg-white h-fit w-fit p-4 shadow-lg m-auto">
+      <div className="bg-white h-fit w-fit p-4 shadow-lg self-start cart-info">
         <div className="flex justify-between mb-2 mx-2">
           <p>Subtotal</p>
           <p>$30.99</p>
@@ -166,10 +165,16 @@ export default function CartSummary() {
           <p className="font-semibold text-lg">$100.99</p>
         </div>
         <div className="flex justify-between mx-2">
-          <button onClick={() => navigate('/checkout')} className="shadow-sm rounded-lg bg-blue-500 text-white font-semibold px-4 mr-2 hover:bg-blue-700">
+          <button
+            onClick={() => navigate("/checkout")}
+            className="shadow-sm rounded-lg bg-blue-500 text-white font-semibold px-4 mr-2 hover:bg-blue-700"
+          >
             Checkout
           </button>
-          <button onClick={() => navigate('/')} className="shadow-sm rounded-lg bg-white text-black font-semibold px-4 border border-gray-300 hover:bg-gray-200">
+          <button
+            onClick={() => navigate("/")}
+            className="shadow-sm rounded-lg bg-white text-black font-semibold px-4 border border-gray-300 hover:bg-gray-200"
+          >
             Continue Shopping
           </button>
         </div>

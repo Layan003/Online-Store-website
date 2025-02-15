@@ -59,29 +59,19 @@ export default function Form({ method }) {
             </div>
             <div className="inputs-container">
               <input
-                type="text"
-                className="username-input"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                type="email"
+                className="email-input bg-white"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email: "
                 required
               />
-              {method === "signup" ? (
-                <input
-                  type="email"
-                  className="email-input"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email: "
-                  required
-                />
-              ) : (
-                <span></span>
-              )}
+
               <input
                 type="password"
                 placeholder="Password: "
                 value={password}
+                className="bg-white"
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />

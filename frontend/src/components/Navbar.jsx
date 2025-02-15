@@ -8,7 +8,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   return (
-    <section className="relative shadow-md flex justify-between items-center z-10">
+    <section className="relative shadow-md flex justify-between items-center z-10 min-w-100">
       <div>LOGO</div>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
