@@ -2,8 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import "../styles/Navbar.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <section className="relative shadow-md flex justify-between items-center z-10">
@@ -51,19 +53,19 @@ export default function Navbar() {
             : "nav-items flex gap-8"
         }
       >
-        <li className="py-3">
+        {/* <li className="py-3">
           <Link to="/">Home</Link>
-        </li>
+        </li> */}
         <li className="py-3">
           <Link to="/">Products</Link>
         </li>
         <li className="py-3">
-          <Link to="/">Login</Link>
+          <Link to="/login">Login</Link>
         </li>
         <li className="py-3">
-          <Link to="/">Sign Up</Link>
+          <Link to="/signup">Sign Up</Link>
         </li>
-        <li className="py-3 icon-container">
+        <li className="py-3 icon-container" onClick={() => navigate("/cart")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

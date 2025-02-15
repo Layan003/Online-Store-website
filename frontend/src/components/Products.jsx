@@ -15,17 +15,21 @@ const items = [
   { name: "hahaha", description: "lorumldfnaldfnlnf", price: 32 },
 ];
 
-export default function Hero() {
+export default function Products() {
   return (
-    <section className="relative z-5 bg-white w-10/12 m-auto">
-      <div className="grid grid-cols-4 gap-6">
+    <section className="z-5 w-10/12 m-auto products-section">
+      <div className="grid grid-cols-4 gap-6 products-container">
         {items.map((item, index) => (
           <div key={index} className="product border rounded-lg shadow-md">
-            <img src={img} className="border rounded-lg" />
+            <div>
+              <img src={img} className="border rounded-lg" />
+            </div>
             <div className="flex justify-between items-center mx-4">
               <h1 className="my-2 font-semibold">{item.name}</h1>
-              <p className="my-2 text-sm">${item.price}</p>
+              <p className="my-2 mb-1 text-sm">${item.price}</p>
             </div>
+            <p className="mx-4 text-gray-600">{item.description}</p>
+
             <div className="text-right">
               <button className="my-2 mx-4 font-semibold underline text-sm">
                 Add to cart

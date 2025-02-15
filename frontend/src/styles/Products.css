@@ -1,5 +1,10 @@
-.product {
+.products-section,
+.products-container {
     background-color: var(--white);
+}
+
+.product {
+    background-color: #FFF;
     border-radius: 6px;
 }
 
@@ -8,7 +13,8 @@
 }
 
 .product button {
-    border-radius: 6px;
+    border: none;
+
 }
 
 .product button:hover {
@@ -19,4 +25,14 @@
 .product:hover {
     transform: scale(1.03);
     transition: 0.5s;
+}
+
+@media (max-width: 1024px) {
+    .products-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .products-section {
+        width: 98%;
+    }
 }

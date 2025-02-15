@@ -7,16 +7,19 @@
     --black: #212121;
 }
 
+
 section {
     padding: 1rem 4rem;
-    background-color: var(--white);
-
+    background-color: #FFF;
 }
 
-
+body {
+    background-color: var(--white);
+}
 
 @media (max-width: 640px) {
     section {
         padding: 1rem;
     }
 }
+
