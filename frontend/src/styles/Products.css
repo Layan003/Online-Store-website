@@ -6,10 +6,12 @@
 .product {
     background-color: #FFF;
     border-radius: 6px;
+    border: none;
 }
 
 .product img {
     border-radius: 6px 6px 0px 0px;
+    border: none;
 }
 
 .product button {
@@ -25,6 +27,13 @@
 .product:hover {
     transform: scale(1.03);
     transition: 0.5s;
+}
+
+.category-filter:hover {
+    background-color: rgb(197, 197, 197);
+    transform: scale(1.05);
+    transition: 0.5s;
+
 }
 
 @media (max-width: 1024px) {

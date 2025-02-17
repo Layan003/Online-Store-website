@@ -1,49 +1,52 @@
-import React, { use } from "react";
+import React from "react";
 import "../styles/Form.css";
 import { useState } from "react";
-// import api from '../../api';
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-// import { useAuth } from "../../AuthContext";
-import Navbar from "./Navbar";
+import api from "../api";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Form({ method }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  //   const { setToken, setRefresh } = useAuth();
+  const { setIsAuthenticated } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (method == 'login') {
-    //     try {
-    //         const res = await api.post('token/', {username, password});
-    //         setToken(res.data.access);
-    //         setRefresh(res.data.refresh);
-    //         navigate('/');
-    //     }
-    //     catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-    // else {
-    //     try {
-    //       const res = await api.post("signup/", {
-    //         email,
-    //         username,
-    //         password,
-    //       });
+    if (method == "login") {
+      try {
+        const res = await api.post("token/", { username, password });
+        if (res.status == 200) {
+          localStorage.setItem('access', res.data.access)
+          localStorage.setItem('refresh', res.data.refresh)
+          setIsAuthenticated(true)
+        navigate("/");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    } else { 
+      try {
+        const res = await api.post("signup/", {
+          email,
+          firstName,
+          username,
+          password,
+        });
 
-    //       if (res.status == 201) {
-    //         setToken(res.data.access);
-    //         setRefresh(res.data.refresh);
-    //         navigate("/");
-    //       }
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    // }
+        if (res.status == 201) {
+          localStorage.setItem('access', res.data.access)
+          localStorage.setItem('refresh', res.data.refresh)
+          setIsAuthenticated(true)
+          navigate("/");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   return (
@@ -58,14 +61,35 @@ export default function Form({ method }) {
               <p>Please enter details below</p>
             </div>
             <div className="inputs-container">
+              {method == "signup" && (
+                <input
+                  type="text"
+                  className="email-input bg-white"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Name: "
+                  required
+                />
+              )}
+
               <input
-                type="email"
+                type="text"
                 className="email-input bg-white"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email: "
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username: "
                 required
               />
+              {method == "signup" && (
+                <input
+                  type="email"
+                  className="email-input bg-white"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email: "
+                  required
+                />
+              )}
 
               <input
                 type="password"
@@ -94,7 +118,7 @@ export default function Form({ method }) {
 
             <h2>Forget password?</h2>
 
-            <button type="submit" className="form-button">
+            <button type="submit" className="form-button" onClick={handleSubmit}>
               {method === "login" ? "login" : "signup"}
             </button>
             {method === "login" ? (

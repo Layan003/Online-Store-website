@@ -1,3 +1,10 @@
 .checkout-section {
     background-color: var(--white);
 }
+
+@media (max-width: 1024px) {
+    .checkout-section {
+        min-width: 80%;
+    }
+}
+

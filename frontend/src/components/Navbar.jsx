@@ -3,12 +3,17 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import "../styles/Navbar.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
+  const { isAuthenticated } = useAuth();
   return (
     <section className="relative shadow-md flex justify-between items-center z-10 min-w-100">
+      
+      <br />
+
       <div>LOGO</div>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -59,12 +64,20 @@ export default function Navbar() {
         <li className="py-3">
           <Link to="/">Products</Link>
         </li>
-        <li className="py-3">
-          <Link to="/login">Login</Link>
-        </li>
-        <li className="py-3">
-          <Link to="/signup">Sign Up</Link>
-        </li>
+        {!isAuthenticated && (
+          <li className="py-3">
+            <Link to="/login">Login</Link>
+          </li>
+        )}
+        {!isAuthenticated && (
+          <li className="py-3">
+            <Link to="/signup">Sign Up</Link>
+          </li>
+        )}
+        {isAuthenticated && (<li className="py-3">
+            <Link to="/logout">Logout</Link>
+          </li>)}
+
         <li className="py-3 icon-container" onClick={() => navigate("/cart")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -85,6 +98,7 @@ export default function Navbar() {
           </div>
         </li>
       </ul>
+      {localStorage.getItem('access') && (localStorage.getItem('access')[5])}
     </section>
   );
 }

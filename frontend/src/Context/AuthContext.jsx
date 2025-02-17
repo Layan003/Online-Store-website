@@ -1,22 +1,23 @@
-import React, { Children } from "react";
-import { useState, useContext, createContext, useEffect } from "react";
-import api from "./api";
+import React, { useState, useContext, createContext, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import api from "../api";
 
 const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
-  const [token, setToken] = useState(null);
-  const [refresh, setRefresh] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
-    auth().catch(() => setToken(null));
+    auth().catch(() => setIsAuthenticated(false))
   }, []);
 
   const auth = async () => {
+    const token = localStorage.getItem("access");
     if (!token) {
+      setIsAuthenticated(false);
       return;
     }
+
     const decoded = jwtDecode(token);
     const tokenExp = decoded.exp;
     const now = Date.now() / 1000;
@@ -24,31 +25,34 @@ export default function AuthProvider({ children }) {
     if (tokenExp < now) {
       await refreshToken();
     } else {
-      setToken(null);
+      setIsAuthenticated(true);
     }
   };
 
   const refreshToken = async () => {
     try {
       const res = await api.post("token/refresh/", {
-        refresh: refresh,
+        refresh: localStorage.getItem("refresh"),
       });
+
       if (res.status === 200) {
-        setToken(res.data.access);
+        localStorage.setItem("access", res.data.access);
+        setIsAuthenticated(true);
       } else {
-        setToken(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.log(error);
-      setIsGuest(true);
+      setIsAuthenticated(false);
     }
   };
-  if (!token === null) {
+
+  if (isAuthenticated === null) {
     return <div>Loading...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ setToken, token, setRefresh, refresh }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
