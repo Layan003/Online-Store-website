@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../Context/AuthContext";
+import Loading from "./Loading";
 
 export default function Form({ method }) {
   const [username, setUsername] = useState("");
@@ -13,42 +14,59 @@ export default function Form({ method }) {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { setIsAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [errorMessages, setErrorMessages] = useState({});
+  const [errorMessage, setErrorMessage] = useState(""); //for login
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (method == "login") {
       try {
         const res = await api.post("token/", { username, password });
         if (res.status == 200) {
-          localStorage.setItem('access', res.data.access)
-          localStorage.setItem('refresh', res.data.refresh)
-          setIsAuthenticated(true)
-        navigate("/");
+          localStorage.setItem("access", res.data.access);
+          localStorage.setItem("refresh", res.data.refresh);
+          setIsAuthenticated(true);
+          navigate("/");
         }
       } catch (error) {
-        console.error(error);
+        if (error.response && error.response.data) {
+          setErrorMessage(error.response.data.error);
+          console.log(error.response.data);
+        }
+        setErrorMessage('No active account found with the given credentials');
+      } finally {
+        setLoading(false);
       }
-    } else { 
+    } else {
+      const first_name = firstName;
       try {
         const res = await api.post("signup/", {
           email,
-          firstName,
+          first_name,
           username,
           password,
         });
 
         if (res.status == 201) {
-          localStorage.setItem('access', res.data.access)
-          localStorage.setItem('refresh', res.data.refresh)
-          setIsAuthenticated(true)
+          localStorage.setItem("access", res.data.access);
+          localStorage.setItem("refresh", res.data.refresh);
+          setIsAuthenticated(true);
           navigate("/");
         }
       } catch (error) {
-        console.error(error);
+        setErrorMessage('Something went wrong. Please try again later.');
+      } finally {
+        setLoading(false);
       }
     }
   };
-
+  if (loading == true) {
+    return <Loading />;
+  }
+  const allErrors = Object.values(errorMessages).flat();
   return (
     <>
       <div className="body mt-15">
@@ -101,26 +119,31 @@ export default function Form({ method }) {
               />
               {/* display error messages for sign up */}
               {/* {allErrors.length > 0 && (
-              <div className="warning-message">
-                {allErrors.map((message, index) => (
-                  <p key={index}>{message}</p>
-                ))}
-              </div>
-            )} */}
+                <div className="warning-message">
+                  {allErrors.map((message, index) => (
+                    <p key={index}>{message}</p>
+                  ))}
+                </div>
+              )} */}
 
               {/* display error messages for login */}
-              {/* {errorMessage && (
-              <div className="warning-message">
-                <p>{errorMessage}</p>
-              </div> 
-            )}  */}
+              {errorMessage && (
+                <div className="warning-message">
+                  <p>{errorMessage}</p>
+                </div>
+              )}
             </div>
 
             <h2>Forget password?</h2>
 
-            <button type="submit" className="form-button" onClick={handleSubmit}>
+            <button
+              type="submit"
+              className="form-button"
+              onClick={handleSubmit}
+            >
               {method === "login" ? "login" : "signup"}
             </button>
+            {error && <p className="text-red-500 ">{error}</p>}
             {method === "login" ? (
               <p>
                 Don't have an account?{" "}

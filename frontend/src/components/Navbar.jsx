@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import "../styles/Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
+import api from "../api";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, itemsCount } = useAuth();
+  
   return (
     <section className="relative shadow-md flex justify-between items-center z-10 min-w-100">
-      
-      <br />
 
       <div>LOGO</div>
       <button
@@ -61,8 +61,8 @@ export default function Navbar() {
         {/* <li className="py-3">
           <Link to="/">Home</Link>
         </li> */}
-        <li className="py-3">
-          <Link to="/">Products</Link>
+        <li className="py-3" >
+          <Link to="/" onClick={() => window.location.reload()}>Products</Link>
         </li>
         {!isAuthenticated && (
           <li className="py-3">
@@ -74,9 +74,11 @@ export default function Navbar() {
             <Link to="/signup">Sign Up</Link>
           </li>
         )}
-        {isAuthenticated && (<li className="py-3">
+        {isAuthenticated && (
+          <li className="py-3">
             <Link to="/logout">Logout</Link>
-          </li>)}
+          </li>
+        )}
 
         <li className="py-3 icon-container" onClick={() => navigate("/cart")}>
           <svg
@@ -94,11 +96,10 @@ export default function Navbar() {
             />
           </svg>
           <div className="bg-red-500 cart-count text-sm flex justify-center items-center p-2 font-bold text-white absolute t-0 r-0">
-            3
+            {itemsCount}
           </div>
         </li>
       </ul>
-      {localStorage.getItem('access') && (localStorage.getItem('access')[5])}
     </section>
   );
 }

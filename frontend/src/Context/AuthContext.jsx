@@ -6,10 +6,37 @@ const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [itemsCount, setItemsCount] = useState(0);
+
+  const fetchItemsCount = async () => {
+    try {
+      const res = await api.get("cart/");
+      console.log(res.data);
+      setItemsCount(res.data.items_count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    auth().catch(() => setIsAuthenticated(false))
+    if (isAuthenticated) {
+      fetchItemsCount();
+    } else {
+      setItemsCount(0);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    auth().catch(() => setIsAuthenticated(false));
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchItemsCount();
+    } else {
+      setItemsCount(0);
+    }
+  }, [isAuthenticated]);
 
   const auth = async () => {
     const token = localStorage.getItem("access");
@@ -52,7 +79,9 @@ export default function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, setIsAuthenticated, itemsCount, setItemsCount }}
+    >
       {children}
     </AuthContext.Provider>
   );

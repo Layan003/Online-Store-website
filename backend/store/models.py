@@ -1,5 +1,7 @@
 from django.db import models
 from sorl.thumbnail import ImageField
+from django.contrib.auth.models import User
+
 
 # Create your models here.
 class Category(models.Model):
@@ -27,3 +29,31 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, default=0.00)
+    shipped = models.BooleanField(default=False)
+    date_ordered = models.DateTimeField(blank=True, null=True)
+    date_shipped = models.DateTimeField(blank=True, null=True)
+    completed = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f'Order by - {self.user.first_name}'
+    
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1, null=False, blank=False)
+    
+    def __str__(self):
+        return f'Item - {self.id}'
+    
+
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    address = models.CharField(max_length=200, null=False)
+    city = models.CharField(max_length=200, null=False)
+    zipcode = models.CharField(max_length=200, null=False)

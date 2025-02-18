@@ -1,18 +1,154 @@
 import React from "react";
 import "../styles/Checkout.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api";
+import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import PopUp from "../components/PopUp";
+import Loading from "../components/Loading";
+
 
 export default function Checkout() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [zipcode, setZipcode] = useState("");
-  //   const [name, setName] = useState("");
-  //   const [email, setEmail] = useState("");
   const [cardName, setCardName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpDate, setCardExpDate] = useState("");
   const [cardCvv, setCardCvv] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(null);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState([]);
+  const [addressSuccess, setAddressSuccess] = useState(false);
+const [billingSuccess, setBillingSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        const res = await api.get("address/");
+        if (res.status == 200) {
+          console.log(res.data);
+          setAddress(res.data.address);
+          setCity(res.data.city);
+          setZipcode(res.data.zipcode);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchAddress();
+      setErrors([])
+      setLoading(false)
+    }
+  }, [isAuthenticated]);
+
+  const handleAddressChange = async () => {
+    setLoading(true)
+
+    let data = {};
+    data = {
+      address: address,
+      city: city,
+      zipcode: zipcode,
+    };
+
+    try {
+      const res = await api.post("address/", data);
+      console.log(res.data);
+      if (res.status == 201) {
+        // setSuccess(true);
+        console.log(res.data);
+        setAddressSuccess(true)
+        return
+      }
+      setErrors(prevErrors => {
+        if (!prevErrors.includes("Invalid Address info. Please try again.")) {
+          return [...prevErrors, "Invalid Address info. Please try again."];
+        }
+        return prevErrors;
+      });
+    } catch (error) {
+      console.error(error);
+      setErrors(prevErrors => {
+        if (!prevErrors.includes("Invalid Address info. Please try again.")) {
+          return [...prevErrors, "Invalid Address info. Please try again."];
+        }
+        return prevErrors;
+      });
+    }
+  };
+
+  const handleBillingInfo = async () => {
+    // setLoading(true)
+    const data = {
+      card_name: cardName,
+      card_number: cardNumber,
+      expiry_date: cardExpDate,
+      cvv: cardCvv
+    };
+    try {
+      const res = await api.post("billing_info/", data);
+      console.log(res.data);
+      if (res.status == 200) {
+        // setSuccess(true);
+      console.log(res.data);
+      setBillingSuccess(true)
+      setLoading(false)
+      return
+
+      }
+      setErrors(prevErrors => {
+        if (!prevErrors.includes("Invalid billing info. Please try again.")) {
+          return [...prevErrors, "Invalid billing info. Please try again."];
+        }
+        return prevErrors;
+      });
+
+      
+    } catch (error) {
+      setLoading(false)
+
+      console.error(error);
+      setErrors(prevErrors => {
+        if (!prevErrors.includes("Invalid billing info. Please try again.")) {
+          return [...prevErrors, "Invalid billing info. Please try again."];
+        }
+        return prevErrors;
+      });
+
+    }
+  };
+
+  const submitData = async (e) => {
+    e.preventDefault();
+    setErrors([])
+    setAddressSuccess(false);
+    setBillingSuccess(false);
+
+    await handleAddressChange();
+    await handleBillingInfo()
+    if (addressSuccess && billingSuccess) {
+      placeOrder();
+    } 
+  }
+
+  const placeOrder = async () => {
+      try {
+        const res = await api.get('place_order/')
+        if (res.status ==200){
+          setOrderSuccess(true)
+        }
+        console.log(res.data)
+
+      } catch (error) {
+        console.error(error)
+        
+      }
+  }
 
   return (
     <section className="checkout-section flex-col w-[45%] m-auto">
@@ -117,28 +253,40 @@ export default function Checkout() {
           </div>
         </form>
       </div>
+      {errors &&
+        errors.map((err, i) => (
+          <div key={i} className="text-center text-red-500 font-semibold my-1">
+            {err}
+          </div>
+        ))}
 
       <div className="flex justify-center mt-4 m-auto">
         <button
-          onClick={() => setSuccess(true)}
+          onClick={(e) => submitData(e)}
           type="submit"
           className="shadow-sm rounded-lg bg-blue-500 text-white font-semibold px-4 py-1 hover:bg-blue-700 w-[30%]"
         >
           submit
         </button>
+        <div></div>
       </div>
+      {
+        orderSuccess == true && (  <PopUp
+          onClose={() => navigate("/")}
+          message="Order Placed !"
+          button="Close"
+        />)
+      }
+      {
+        orderSuccess == false && (  <PopUp
+          onClose={() => navigate("/")}
+          message="Order failed to place. Make sure you have items in cart.."
+          button="Close"
+        />)
+      }
 
-      {/* TODO: update the popup style */}
-      {success && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-          <div className="bg-white rounded-lg shadow-lg  p-10 flex-col justify-center items-center">
-            <p className="font-semibold p-3">success!!</p>
-            <button onClick={() => setSuccess(false)} className="px-4 py-2">
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+  
+      {loading ? <Loading /> : <span></span>}
     </section>
   );
 }

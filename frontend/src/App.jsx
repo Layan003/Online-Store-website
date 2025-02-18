@@ -6,11 +6,15 @@ import SignUp from "./pages/SignUp";
 import CartSummary from "./pages/CartSummary";
 import Layout from "./components/Layout";
 import Checkout from "./pages/Checkout";
-import { useAuth } from "./Context/AuthContext";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "./Context/AuthContext";
+
 
 function Logout() {
+  const {setIsAuthenticated} =useAuth();
+  setIsAuthenticated(false);
   localStorage.clear()
+  
   return <Navigate to="/" />;
 }
 
@@ -29,6 +33,7 @@ function App() {
         <Route path="/cart" element={<Layout><CartSummary /></Layout>} />
         <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
         <Route path="/logout" element={<Layout><Logout /></Layout>} />
+
 
 
       </Routes>
