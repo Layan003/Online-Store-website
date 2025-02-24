@@ -44,7 +44,8 @@ def add_cart_item(request):
     tp = 0
     order_items = order.items.all()
     for item in order_items:
-        tp = tp + item.product.price * item.quantity
+        if item.product.stock_quantity != 0:
+            tp = tp + item.product.price * item.quantity
     order.total_price = tp
     order.save()
     return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
@@ -55,6 +56,19 @@ def add_cart_item(request):
 def get_cart(request):
     try:
         order = Order.objects.get(user=request.user, completed=False)  
+        # order_items = order.items.all()
+        # total_price
+        # for item in order_items:
+        #     if item.stock_quantity != 0:
+
+        tp = 0
+        order_items = order.items.all()
+        for item in order_items:
+            if item.product.stock_quantity != 0:
+                tp = tp + item.product.price * item.quantity
+        order.total_price = tp
+        order.save()
+
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Order.DoesNotExist:

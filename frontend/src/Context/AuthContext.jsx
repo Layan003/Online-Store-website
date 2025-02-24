@@ -1,4 +1,10 @@
-import React, { useState, useContext, createContext, useEffect } from "react";
+import React, {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../api";
 
@@ -18,6 +24,25 @@ export default function AuthProvider({ children }) {
     }
   };
 
+  // useLayoutEffect(() => {
+  //   const verifyToken = async () => {
+  //     try {
+  //       const token = localStorage.getItem("access");
+  //       if (!token) {
+  //         setIsAuthenticated(false);
+  //         return;
+  //       }
+  //       const res = await api.post("token/verify/", { access: token });
+  //       console.log(res.data);
+  //     } catch (error) {
+  //       console.error(error);
+  //       setIsAuthenticated(false);
+  //       localStorage.clear();
+  //     }
+  //   };
+  //   verifyToken();
+  // }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchItemsCount();
@@ -27,7 +52,10 @@ export default function AuthProvider({ children }) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    auth().catch(() => setIsAuthenticated(false));
+    auth().catch(() => {
+      setIsAuthenticated(false);
+      localStorage.clear();
+    });
   }, []);
 
   useEffect(() => {
@@ -67,10 +95,13 @@ export default function AuthProvider({ children }) {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
+        localStorage.clear()
       }
     } catch (error) {
       console.log(error);
       setIsAuthenticated(false);
+      localStorage.clear()
+
     }
   };
 

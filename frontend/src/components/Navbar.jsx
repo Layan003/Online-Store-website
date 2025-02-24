@@ -10,6 +10,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const { isAuthenticated, itemsCount } = useAuth();
+  const [key, setKey] = useState(0);
   
   return (
     <section className="relative shadow-md flex justify-between items-center z-10 min-w-100">
@@ -52,6 +53,7 @@ export default function Navbar() {
         )}
       </button>
       <ul
+      key={key}
         className={
           isExpanded
             ? "nav-items expanded p-3 shadow-md"
@@ -62,7 +64,7 @@ export default function Navbar() {
           <Link to="/">Home</Link>
         </li> */}
         <li className="py-3" >
-          <Link to="/" onClick={() => window.location.reload()}>Products</Link>
+          <Link to="/">Products</Link>
         </li>
         {!isAuthenticated && (
           <li className="py-3">

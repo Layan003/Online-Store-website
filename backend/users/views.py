@@ -7,7 +7,7 @@ from .serializers import UserSerializer
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-
+from rest_framework_simplejwt.tokens import AccessToken
 
 @api_view(['POST'])
 def sign_up(request):
@@ -38,4 +38,20 @@ def login(request):
         
     refresh = RefreshToken.for_user(user)
     access = refresh.access_token
+    # is_admin = True if request.user.is_admin else False
+    # return Response({"access": str(access), 'refresh': str(refresh), 'is_admin': is_admin}, status=status.HTTP_200_OK)
     return Response({"access": str(access), 'refresh': str(refresh)}, status=status.HTTP_200_OK)
+
+
+@api_view()
+def verify_token(request):
+    token = request.data.get('access')
+    if token:
+        try:
+            AccessToken(token)
+            print(AccessToken(token))
+            return Response({})
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({"error": "no token was sent"}, status=status.HTTP_400_BAD_REQUEST)

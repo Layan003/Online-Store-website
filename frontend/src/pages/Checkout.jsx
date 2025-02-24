@@ -19,13 +19,14 @@ export default function Checkout() {
   const [orderSuccess, setOrderSuccess] = useState(null);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(null);
   const [errors, setErrors] = useState([]);
   const [addressSuccess, setAddressSuccess] = useState(false);
 const [billingSuccess, setBillingSuccess] = useState(false);
 
   useEffect(() => {
     const fetchAddress = async () => {
+      setLoading(true)
       try {
         const res = await api.get("address/");
         if (res.status == 200) {
@@ -37,17 +38,18 @@ const [billingSuccess, setBillingSuccess] = useState(false);
       } catch (error) {
         console.error(error);
       }
+      finally {
+        setLoading(false)
+      }
     };
 
     if (isAuthenticated) {
       fetchAddress();
       setErrors([])
-      setLoading(false)
     }
   }, [isAuthenticated]);
 
   const handleAddressChange = async () => {
-    setLoading(true)
 
     let data = {};
     data = {
@@ -90,6 +92,9 @@ const [billingSuccess, setBillingSuccess] = useState(false);
       expiry_date: cardExpDate,
       cvv: cardCvv
     };
+    if (cardCvv.length > 3 || cardCvv.length < 3) {
+      setErrors(prevErrors => [...prevErrors, "Card CVV must be 3 digits ."]);
+    }
     try {
       const res = await api.post("billing_info/", data);
       console.log(res.data);
@@ -110,7 +115,6 @@ const [billingSuccess, setBillingSuccess] = useState(false);
 
       
     } catch (error) {
-      setLoading(false)
 
       console.error(error);
       setErrors(prevErrors => {
@@ -124,6 +128,7 @@ const [billingSuccess, setBillingSuccess] = useState(false);
   };
 
   const submitData = async (e) => {
+    setLoading(true)
     e.preventDefault();
     setErrors([])
     setAddressSuccess(false);
@@ -132,8 +137,10 @@ const [billingSuccess, setBillingSuccess] = useState(false);
     await handleAddressChange();
     await handleBillingInfo()
     if (addressSuccess && billingSuccess) {
+      setLoading(false)
       placeOrder();
     } 
+    setLoading(false)
   }
 
   const placeOrder = async () => {
