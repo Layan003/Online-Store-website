@@ -1,0 +1,39 @@
+.dashboard-section {
+    background-color: var(--white);
+}
+.dashboard-section * {
+    font-size: 0.97rem;
+}
+.hr-line2 {
+    width: 100%;
+    margin: auto;
+    height: 1px;
+    background-color: #ededed;
+
+}
+
+
+@media (max-width: 1024px) {
+    .dashboard-section {
+        padding: 1rem 0.5rem;
+    }
+    .dashboard-section * {
+        font-size: 0.85rem;
+    }
+
+}
+
+@media (max-width: 640px) {
+    .dashboard-section {
+        padding: 0;
+        margin: 0;
+    }
+    .dashboard-section * {
+        font-size: 0.65rem;
+    }
+    .orders-container {
+        /* padding: 1rem 0.5rem; */
+        margin: 0;
+    }
+
+}

@@ -13,7 +13,7 @@ export default function Form({ method }) {
   const [firstName, setFirstName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setIsAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [errorMessages, setErrorMessages] = useState({});
   const [errorMessage, setErrorMessage] = useState(""); //for login
@@ -28,15 +28,23 @@ export default function Form({ method }) {
         if (res.status == 200) {
           localStorage.setItem("access", res.data.access);
           localStorage.setItem("refresh", res.data.refresh);
+          // if(res.data.is_admin){
+          //   setIsAdmin(setIsAdmin)
+          // }
+          console.log(res.data)
           setIsAuthenticated(true);
           navigate("/");
         }
       } catch (error) {
         if (error.response && error.response.data) {
+          // setErrorMessage(error.response.data.error);
+          // console.log(error.response.data);
           setErrorMessage(error.response.data.error);
-          console.log(error.response.data);
         }
+        else {
         setErrorMessage('No active account found with the given credentials');
+
+        }
       } finally {
         setLoading(false);
       }

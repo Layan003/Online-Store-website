@@ -1,12 +1,13 @@
 from django.db import models
 from sorl.thumbnail import ImageField
 from django.contrib.auth.models import User
+import datetime
+from django.dispatch import receiver
+from django.db.models.signals import post_save, pre_save 
 
 
-# Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    # description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -57,3 +58,12 @@ class Address(models.Model):
     address = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
     zipcode = models.CharField(max_length=200, null=False)
+
+
+# @receiver(pre_save, sender=Order)
+# def set_shipped_date_on_update(sender, instance, **kwargs):
+# 	if instance.pk:
+# 		now = datetime.datetime.now()
+# 		obj = sender._default_manager.get(pk=instance.pk)
+# 		if instance.shipped and not obj.shipped:
+# 			instance.date_shipped = now

@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Product, Category, Order, OrderItem, Address
 
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -23,9 +22,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     items_count = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user.username', read_only=True)
     class Meta:
         model = Order
-        fields = ['id', 'items', 'total_price', 'shipped', 'date_ordered', 'completed', 'items_count' ]
+        fields = ['id', 'items', 'total_price', 'shipped', 'date_ordered', 'completed', 'items_count', 'date_shipped', 'username']
 
     def get_items_count(self, obj):
         return obj.items.count()

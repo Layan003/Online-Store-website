@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from .serializers import UserSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import AccessToken
@@ -38,10 +38,16 @@ def login(request):
         
     refresh = RefreshToken.for_user(user)
     access = refresh.access_token
-    # is_admin = True if request.user.is_admin else False
-    # return Response({"access": str(access), 'refresh': str(refresh), 'is_admin': is_admin}, status=status.HTTP_200_OK)
-    return Response({"access": str(access), 'refresh': str(refresh)}, status=status.HTTP_200_OK)
+    # is_admin = request.user.is_superuser
+    # print(request)
 
+    return Response({"access": str(access), 'refresh': str(refresh)}, status=status.HTTP_200_OK)
+    # return Response({"access": str(access), 'refresh': str(refresh)}, status=status.HTTP_200_OK)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def is_admin(request):
+    is_admin = request.user.is_staff
+    return Response({'is_admin': is_admin}, status=status.HTTP_200_OK)
 
 @api_view()
 def verify_token(request):

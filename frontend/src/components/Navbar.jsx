@@ -9,12 +9,11 @@ import api from "../api";
 export default function Navbar() {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isAuthenticated, itemsCount } = useAuth();
+  const { isAuthenticated, itemsCount, isAdmin } = useAuth();
   const [key, setKey] = useState(0);
   
   return (
     <section className="relative shadow-md flex justify-between items-center z-10 min-w-100">
-
       <div>LOGO</div>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -53,17 +52,20 @@ export default function Navbar() {
         )}
       </button>
       <ul
-      key={key}
+        key={key}
         className={
           isExpanded
             ? "nav-items expanded p-3 shadow-md"
             : "nav-items flex gap-8"
         }
       >
-        {/* <li className="py-3">
-          <Link to="/">Home</Link>
-        </li> */}
-        <li className="py-3" >
+        {isAdmin&&isAuthenticated && (
+          <li className="py-3">
+            <Link to="/dashboard">Dashboard</Link>
+          </li>
+        )}
+
+        <li className="py-3">
           <Link to="/">Products</Link>
         </li>
         {!isAuthenticated && (

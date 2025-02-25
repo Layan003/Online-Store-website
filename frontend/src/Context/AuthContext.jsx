@@ -12,6 +12,8 @@ const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(null);
+
   const [itemsCount, setItemsCount] = useState(0);
 
   const fetchItemsCount = async () => {
@@ -24,28 +26,24 @@ export default function AuthProvider({ children }) {
     }
   };
 
-  // useLayoutEffect(() => {
-  //   const verifyToken = async () => {
-  //     try {
-  //       const token = localStorage.getItem("access");
-  //       if (!token) {
-  //         setIsAuthenticated(false);
-  //         return;
-  //       }
-  //       const res = await api.post("token/verify/", { access: token });
-  //       console.log(res.data);
-  //     } catch (error) {
-  //       console.error(error);
-  //       setIsAuthenticated(false);
-  //       localStorage.clear();
-  //     }
-  //   };
-  //   verifyToken();
-  // }, []);
+  const fetchIsAdmin = async () => {
+    try {
+      const res = await api.get('is-admin/')
+      console.log(res.data);
+      setIsAdmin(res.data.is_admin)
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+
 
   useEffect(() => {
     if (isAuthenticated) {
+      fetchIsAdmin();
       fetchItemsCount();
+      
     } else {
       setItemsCount(0);
     }
@@ -111,7 +109,7 @@ export default function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, setIsAuthenticated, itemsCount, setItemsCount }}
+      value={{ isAuthenticated, setIsAuthenticated, itemsCount, setItemsCount, setIsAdmin, isAdmin }}
     >
       {children}
     </AuthContext.Provider>

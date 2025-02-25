@@ -6,6 +6,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import timezone
+from django.db.models import Q 
+
 
 class ProductsView(generics.ListAPIView):
     permission_classes =[AllowAny]
@@ -172,3 +174,48 @@ def place_order(request):
     order.save()
 
     return Response({"detail": "Order successfully completed."}, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def orders(request):
+    if request.user.is_staff:
+        # filters = request.GET.getlist('filtesr')
+        orders = Order.objects.all()
+
+        # if 'shipped' in filters:
+        #     filter_conditions |= Q(shipped=True)
+        # if 'unshipped' in filters:
+        #     filter_conditions |= Q(shipped=False)
+        # if 'completed' in filters:
+        #     filter_conditions |= Q(completed=True)
+        # if 'uncompleted' in filters:
+        #     filter_conditions |= Q(completed=False)
+
+        # if filters:
+        #     orders = orders.filter(filter_conditions)
+        #     orders_serializer = OrderSerializer(orders, many=True)
+        #     return Response(orders_serializer.data, status=status.HTTP_200_OK)
+        
+        orders_serializer = OrderSerializer(orders, many=True)
+        return Response(orders_serializer.data, status=status.HTTP_200_OK)
+        
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def change_shipped_status(request, id):
+    if request.user.is_staff:
+        order = get_object_or_404(Order, id=id)
+        if order.shipped:
+            order.shipped = False
+            order.date_shipped = None
+        else:
+            order.shipped = True
+            order.date_shipped = timezone.now()
+        order.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
