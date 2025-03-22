@@ -13,8 +13,8 @@ export default function Navbar() {
   const [key, setKey] = useState(0);
   
   return (
-    <section className="relative shadow-md flex justify-between items-center z-10 min-w-100">
-      <div>LOGO</div>
+    <section className="relative shadow-md flex justify-end items-center z-10 min-w-100">
+     
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="nav-hamburger"

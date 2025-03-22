@@ -4,7 +4,7 @@ from .serializers import ProductSerializer, CategorySerializer, OrderItemSeriali
 from .models import Category, Product, Order, OrderItem, Address
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.utils import timezone
 from django.db.models import Q 
 
@@ -176,25 +176,31 @@ def place_order(request):
     return Response({"detail": "Order successfully completed."}, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAdminUser])
 def orders(request):
     if request.user.is_staff:
-        # filters = request.GET.getlist('filtesr')
+        shipped = request.query_params.get('shipped')
+        unshipped = request.query_params.get('unShipped')
+        completed = request.query_params.get('completed')
+        uncompleted = request.query_params.get('unCompleted')
+
         orders = Order.objects.all()
+        condition = Q()
+        if shipped:
+            condition |= Q(shipped=True)
+        if unshipped:
+            condition |= Q(shipped=False)
+        if completed:
+            condition |= Q(completed=True)
+        if uncompleted:
+            condition |= Q(completed=False)
 
-        # if 'shipped' in filters:
-        #     filter_conditions |= Q(shipped=True)
-        # if 'unshipped' in filters:
-        #     filter_conditions |= Q(shipped=False)
-        # if 'completed' in filters:
-        #     filter_conditions |= Q(completed=True)
-        # if 'uncompleted' in filters:
-        #     filter_conditions |= Q(completed=False)
-
-        # if filters:
-        #     orders = orders.filter(filter_conditions)
-        #     orders_serializer = OrderSerializer(orders, many=True)
-        #     return Response(orders_serializer.data, status=status.HTTP_200_OK)
+        print(condition)
+        
+        if condition:
+            orders = orders.filter(condition)
+            orders_serializer = OrderSerializer(orders, many=True)
+            return Response(orders_serializer.data, status=status.HTTP_200_OK)
         
         orders_serializer = OrderSerializer(orders, many=True)
         return Response(orders_serializer.data, status=status.HTTP_200_OK)
@@ -204,7 +210,7 @@ def orders(request):
     
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAdminUser])
 def change_shipped_status(request, id):
     if request.user.is_staff:
         order = get_object_or_404(Order, id=id)

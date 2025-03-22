@@ -15,6 +15,11 @@ export default function Dashboard() {
     'completed': null,
     'uncompleted': null
   }) 
+  const [unCompleted, setUnCompleted] = useState(false)
+  const [completed, setCompleted] = useState(false)
+  const [shipped, setShipped] = useState(false)
+  const [unShipped, setUnShipped] = useState(false)
+
 
   const fetchOrders = async () => {
     try {
@@ -47,68 +52,62 @@ export default function Dashboard() {
     fetchOrders();
   }, []);
 
-//   const fetchFilters = async () => {
-//     // ?category=${categoryName}
-//     let filterParams = [];
-//     Object.entries(filters).forEach(([key, value]) => {
-//         if (value) {
-//             filterParams.push(key)
-//         }
-//       });
-//       let filterQuery = filterParams.length > 0 ? filterParams.join('&') : '';
-//     //   try {
-//     //     const res = await api.get(`orders/?filter=${filterQuery}`);
-//     //     console.log(res.data);
+  const fetchFilters = async () => {
+    // ?category=${categoryName}
+    let filterParams = [];
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value) {
+            filterParams.push(key)
+        }
+      });
+      let filterQuery = filterParams.length > 0 ? filterParams.join('&') : '';
+    //   try {
+    //     const res = await api.get(`orders/?filter=${filterQuery}`);
+    //     console.log(res.data);
 
-//     //   }
-//     //   catch (error) {
-//     //     console.log(error)
-//     //   }
-//       console.log(filterParams)
+    //   }
+    //   catch (error) {
+    //     console.log(error)
+    //   }
+      console.log(filterParams)
+  }
+  useEffect(() => {
+    // console.log('changed!!')
+    let filters = [];
 
-//   }
+    if (shipped) filters.push('shipped=true')
+    if (unShipped) filters.push('unShipped=true')
+    if (completed) filters.push('completed=true')
+    if (unCompleted) filters.push('unCompleted=true')
 
-//   const selectFilter = async (filter) => {
-//     setFilters(prevs => {
-//         const updatedFilters = {... prevs}
-//         updatedFilters[filter] = prevs[filter] === true ? null : true; 
-//         return updatedFilters
-//     })
-//     fetchFilters();
-//   }
+    let query = filters.length > 0 ? filters.join("&") : "";
+
+    console.log(query)
+    const fetchByFilter = async () => {
+      try {
+        const res = await api.get(`/orders/?${query}`)
+        console.log(res.data)
+        setOrders(res.data)
+       }
+       catch (error) {
+        console.log(error)
+       }
+    }
+    fetchByFilter()
+  
+  }, [shipped,unCompleted, completed, unShipped])
+
 
   return (
     <section className="dashboard-section mx-4 my-2">
-      {/* filters */}
 
-      {/* <div className="flex gap-3 my-2">
-        {Object.keys(filters).map((filter) => (
-          <div
-          key={filter}
-            className="border bg-white border-none rounded-lg px-2 shadow-md"
-            onClick={() => selectFilter(filter)}
-          >
-            {filter}
-          </div>
-        ))}
-      </div> */}
+      <div className="flex gap-3 my-2">
+        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${shipped ? 'bg-gray-300': 'bg-white'}`} onClick={() => setShipped(prev => !prev)}>Shipped</div>
+        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${unShipped ? 'bg-gray-300': 'bg-white'}`} onClick={() => setUnShipped(prev => !prev)}>Un Shipped</div>
+        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${completed ? 'bg-gray-300': 'bg-white'}`} onClick={() => setCompleted(prev => !prev)}>Completed</div>
+        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${unCompleted ? 'bg-gray-300': 'bg-white'}`} onClick={() => setUnCompleted(prev => !prev)}>Un Completed</div>
+      </div>
 
-      {/* <div className="flex gap-3 my-2">
-        <div className="border bg-white border-none rounded-lg px-2 shadow-md">
-          Completed
-        </div>
-        <div className="border bg-white border-none rounded-lg px-2 shadow-md">
-          Uncompleted
-        </div>
-        <div className="border bg-white border-none rounded-lg px-2 shadow-md">
-          Shipped
-        </div>
-        <div className="border bg-white border-none rounded-lg px-2 shadow-md">
-          Unshipped
-        </div>
-      </div> */}
-
-      {/* dashboard container */}
       <div className="bg-white rounded-lg shadow-md px-3 py-2 orders-container">
         <>
           <div className="flex justify-between my-2  order-container">
