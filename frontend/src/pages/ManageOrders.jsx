@@ -4,24 +4,22 @@ import { useAuth } from "../Context/AuthContext";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import Loading from "../components/Loading";
+import PopUp from "../components/PopUp";
 
-export default function Dashboard() {
+export default function ManageOrders() {
   const { isAdmin, isAuthenticated } = useAuth();
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
-  const [filters, setFilters] = useState({
-    'shipped': null, 
-    'unshipped': null,
-    'completed': null,
-    'uncompleted': null
-  }) 
-  const [unCompleted, setUnCompleted] = useState(false)
-  const [completed, setCompleted] = useState(false)
-  const [shipped, setShipped] = useState(false)
-  const [unShipped, setUnShipped] = useState(false)
-
+  const [loading, setLoading] = useState(true);
+  const [unCompleted, setUnCompleted] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [shipped, setShipped] = useState(false);
+  const [unShipped, setUnShipped] = useState(false);
+  const [showPopUp, setShowPopUp] = useState(false);
 
   const fetchOrders = async () => {
+    setLoading(true);
     try {
       const res = await api.get("orders/");
       if (res.status == 200) {
@@ -31,6 +29,8 @@ export default function Dashboard() {
       console.log(res.status);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,73 +39,77 @@ export default function Dashboard() {
       const res = await api.get(`order/${id}/shipped-status/`);
       fetchOrders();
     } catch (error) {
-      console.log(error);
+      if (error.response && error.status === 400) {
+        if (error.response.data) {
+          setShowPopUp(true);
+          console.log(error.response.data);
+        }
+      }
     }
   };
 
+
   useEffect(() => {
-    if (!isAdmin) {
-      navigate("/");
-      return;
-    }
-
-    fetchOrders();
-  }, []);
-
-  const fetchFilters = async () => {
-    // ?category=${categoryName}
-    let filterParams = [];
-    Object.entries(filters).forEach(([key, value]) => {
-        if (value) {
-            filterParams.push(key)
-        }
-      });
-      let filterQuery = filterParams.length > 0 ? filterParams.join('&') : '';
-    //   try {
-    //     const res = await api.get(`orders/?filter=${filterQuery}`);
-    //     console.log(res.data);
-
-    //   }
-    //   catch (error) {
-    //     console.log(error)
-    //   }
-      console.log(filterParams)
-  }
-  useEffect(() => {
-    // console.log('changed!!')
     let filters = [];
 
-    if (shipped) filters.push('shipped=true')
-    if (unShipped) filters.push('unShipped=true')
-    if (completed) filters.push('completed=true')
-    if (unCompleted) filters.push('unCompleted=true')
+    if (shipped) filters.push("shipped=true");
+    if (unShipped) filters.push("unShipped=true");
+    if (completed) filters.push("completed=true");
+    if (unCompleted) filters.push("unCompleted=true");
 
     let query = filters.length > 0 ? filters.join("&") : "";
 
-    console.log(query)
+    console.log(query);
     const fetchByFilter = async () => {
+      setLoading(true);
       try {
-        const res = await api.get(`/orders/?${query}`)
-        console.log(res.data)
-        setOrders(res.data)
-       }
-       catch (error) {
-        console.log(error)
-       }
-    }
-    fetchByFilter()
-  
-  }, [shipped,unCompleted, completed, unShipped])
-
+        const res = await api.get(`/orders/?${query}`);
+        console.log(res.data);
+        setOrders(res.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchByFilter();
+  }, [shipped, unCompleted, completed, unShipped]);
 
   return (
     <section className="dashboard-section mx-4 my-2">
-
       <div className="flex gap-3 my-2">
-        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${shipped ? 'bg-gray-300': 'bg-white'}`} onClick={() => setShipped(prev => !prev)}>Shipped</div>
-        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${unShipped ? 'bg-gray-300': 'bg-white'}`} onClick={() => setUnShipped(prev => !prev)}>Un Shipped</div>
-        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${completed ? 'bg-gray-300': 'bg-white'}`} onClick={() => setCompleted(prev => !prev)}>Completed</div>
-        <div className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${unCompleted ? 'bg-gray-300': 'bg-white'}`} onClick={() => setUnCompleted(prev => !prev)}>Un Completed</div>
+        <div
+          className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${
+            shipped ? "bg-gray-300" : "bg-white"
+          }`}
+          onClick={() => setShipped((prev) => !prev)}
+        >
+          Shipped
+        </div>
+        <div
+          className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${
+            unShipped ? "bg-gray-300" : "bg-white"
+          }`}
+          onClick={() => setUnShipped((prev) => !prev)}
+        >
+          Un Shipped
+        </div>
+        <div
+          className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${
+            completed ? "bg-gray-300" : "bg-white"
+          }`}
+          onClick={() => setCompleted((prev) => !prev)}
+        >
+          Completed
+        </div>
+        <div
+          className={`rounded-lg px-2 shadow-md hover:cursor-pointer transition-all hover:bg-gray-100 ${
+            unCompleted ? "bg-gray-300" : "bg-white"
+          }`}
+          onClick={() => setUnCompleted((prev) => !prev)}
+        >
+          Un Completed
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md px-3 py-2 orders-container">
@@ -122,7 +126,7 @@ export default function Dashboard() {
           <div className="hr-line2"></div>
         </>
 
-        {orders.length != 0 &&
+        {orders.length !== 0 &&
           orders.map((item) => (
             <div key={item.id}>
               <div className="flex justify-between my-2 order-container">
@@ -167,10 +171,17 @@ export default function Dashboard() {
                     : "-"}
                 </p>
               </div>
-              {/* <div className="hr-line2"></div> */}
             </div>
           ))}
       </div>
+      {loading && <Loading />}
+      {showPopUp && (
+        <PopUp
+          onClose={() => setShowPopUp(false)}
+          message={"You can't mark an order as shipped unless it is completed"}
+          button={"close"}
+        />
+      )}
     </section>
   );
 }

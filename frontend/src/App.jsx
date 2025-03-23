@@ -8,7 +8,11 @@ import Layout from "./components/Layout";
 import Checkout from "./pages/Checkout";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/ManageOrders";
+import Orders from "./pages/Orders";
+import ManageProducts from "./pages/ManageProducts";
+import ManageOrders from "./pages/ManageOrders";
+
 
 function Logout() {
   const {setIsAuthenticated} =useAuth();
@@ -33,7 +37,11 @@ function App() {
         <Route path="/cart" element={<Layout><CartSummary /></Layout>} />
         <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
         <Route path="/logout" element={<Layout><Logout /></Layout>} />
-        <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+        <Route path="/manage-orders" element={<Layout><ManageOrders /></Layout>} />
+        <Route path="/manage-products" element={<Layout><ManageProducts /></Layout>} />
+        <Route path="/orders" element={<Layout><Orders /></Layout>} />
+
+
 
 
 

@@ -12,7 +12,14 @@ urlpatterns = [
     path('billing_info/', views.billing_info),
     path('place_order/', views.place_order),
     path('orders/', views.orders),
+    path('user-order/', views.userOrders.as_view()),
     path('order/<int:id>/shipped-status/', views.change_shipped_status), 
+    path('manage-products/', views.ManageProducts.as_view()),
+    # path('manage/', views.debug_view),
+
+    path('manage-product/<int:pk>/', views.ManageProduct.as_view()), 
+
+
 
 
 ]

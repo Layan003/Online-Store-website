@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.utils import timezone
 from django.db.models import Q 
-
+from rest_framework.parsers import MultiPartParser, FormParser,JSONParser
 
 class ProductsView(generics.ListAPIView):
     permission_classes =[AllowAny]
@@ -17,6 +17,10 @@ class ProductsView(generics.ListAPIView):
         queryset = Product.objects.all()
         category = self.request.query_params.get('category')
         price = self.request.query_params.get('price')
+        search = self.request.query_params.get('search')
+
+        if search:
+            queryset = queryset.filter(Q(name__icontains=search) | Q(description__icontains=search))
         if category:
             queryset = queryset.filter(category__name=category)
         if price:
@@ -214,6 +218,8 @@ def orders(request):
 def change_shipped_status(request, id):
     if request.user.is_staff:
         order = get_object_or_404(Order, id=id)
+        if not order.completed:
+            return Response({'error': 'can not be marked as shipped'}, status=status.HTTP_400_BAD_REQUEST)
         if order.shipped:
             order.shipped = False
             order.date_shipped = None
@@ -225,3 +231,57 @@ def change_shipped_status(request, id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+class userOrders(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    model = Order
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        query = Order.objects.filter(user=self.request.user)
+        return query
+    
+
+class ManageProducts(generics.ListCreateAPIView):
+    serializer_class = ProductSerializer
+    model = Product
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Product.objects.all()
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def get_queryset(self):
+        query = Product.objects.all()
+        search = self.request.query_params.get('search')
+        stock = self.request.query_params.get('stock')
+        if search:
+            query = query.filter(Q(name__icontains=search) | Q(description__icontains=search))
+        if stock:
+            query = query.filter(Q(stock_quantity__lte=stock))
+        return query
+    
+class ManageProduct(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProductSerializer
+    model = Product
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Product.objects.all()
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def patch(self, request, *args, **kwargs):
+        data = request.data
+        product = self.get_object()
+        # print(request.data)
+        newData = {
+            'id': product.id,
+            'name': data.get('name'),
+            'description':data.get('description'),
+            'price':data.get('price'),
+            'stock_quantity':data.get('stock_quantity'),
+            'category':data.get('category'),
+        }
+        if 'image' in data:
+            newData['image'] = data.get('image')
+        serializer = ProductSerializer(product, data=newData)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

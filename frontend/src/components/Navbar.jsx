@@ -5,16 +5,16 @@ import "../styles/Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import api from "../api";
+import Loading from "./Loading";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const { isAuthenticated, itemsCount, isAdmin } = useAuth();
   const [key, setKey] = useState(0);
-  
+
   return (
     <section className="relative shadow-md flex justify-end items-center z-10 min-w-100">
-     
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="nav-hamburger"
@@ -59,12 +59,21 @@ export default function Navbar() {
             : "nav-items flex gap-8"
         }
       >
-        {isAdmin&&isAuthenticated && (
+        {isAdmin && isAuthenticated && (
           <li className="py-3">
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/manage-products">Manage Products</Link>
           </li>
         )}
 
+        {isAdmin && isAuthenticated && (
+          <li className="py-3">
+            <Link to="/manage-orders">Manage Orders</Link>
+          </li>
+        )}
+
+        <li className="py-3">
+          <Link to="/orders">My Orders</Link>
+        </li>
         <li className="py-3">
           <Link to="/">Products</Link>
         </li>

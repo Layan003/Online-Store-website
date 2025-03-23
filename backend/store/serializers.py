@@ -1,16 +1,32 @@
 from rest_framework import serializers
 from .models import Product, Category, Order, OrderItem, Address
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = "__all__"
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
+
+class ProductSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'price', 'stock_quantity', 'image', 'created_at', 'updated_at', 'category', 'category_name']
+
+    def create(self, validated_data):
+        validated_data['price'] = float(validated_data['price'])
+        validated_data['stock_quantity'] = int(validated_data['stock_quantity'])
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        if 'price' in validated_data:
+            validated_data['price'] = float(validated_data['price'])
+        if 'stock_quantity' in validated_data:
+            validated_data['stock_quantity'] = int(validated_data['stock_quantity'])
+        return super().update(instance, validated_data)
+
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer()

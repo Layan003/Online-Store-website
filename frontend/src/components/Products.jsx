@@ -11,11 +11,13 @@ export default function Products() {
   const { isAuthenticated, setItemsCount } = useAuth();
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState([]);
-  const [price, setPrice] = useState(50);
+  const [price, setPrice] = useState(500);
   const [isCategoryEmpty, setIsCategoryEmpty] = useState(null);
   const [showPopUp, setShowPopUp] = useState(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -26,6 +28,31 @@ export default function Products() {
       console.log(res.data);
     } catch (error) {
       console.error("error fetching products: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProductSearch = async () => {
+    try {
+      const res = await api.get(`products/?search=${search}`);
+      setProducts(res.data);
+      setLoading(false);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchProductByPrice = async () => {
+    try {
+      const res = await api.get(`products/?price=${price}`);
+      setProducts(res.data);
+      setLoading(false);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -86,7 +113,33 @@ export default function Products() {
 
   return (
     <section className="z-5 w-10/12 m-auto products-section ">
-      <div className="flex gap-3 my-2">
+      <div className="mb-4 border border-gray-200 flex items-center gap-3 p-1 rounded-lg shadow-md w-fit bg-white">
+        <input
+          type="text"
+          className="focus:outline-none p-1"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ border: "none" }}
+          placeholder="Search here..."
+        />
+        <img
+          src="/search.svg"
+          alt="search icon"
+          className="hover:opacity-50 hover:cursor-pointer"
+          onClick={() => fetchProductSearch()}
+        />
+      </div>
+      <div className="shadow-md rounded-lg w-fit p-2 flex gap-2 items-center border border-gray-200 bg-white">
+        <p className="">Price:</p>
+        <div className="flex items-center gap-1">
+          <span>0</span> 
+          <input type="range" min="0" max="1000" onChange={(e) => {setPrice(e.target.value)
+            fetchProductByPrice()
+          }} value={price} />
+          <span>{price}</span>
+        </div>
+      </div>
+      <div className="flex gap-3 my-4 flex-wrap">
         <div
           className="border border-gray-300 rounded-lg px-2 shadow-sm category-filter"
           onClick={() => {
@@ -99,7 +152,7 @@ export default function Products() {
         {category.map((category) => (
           <div
             key={category.name}
-            className="border border-gray-300 rounded-lg px-2 shadow-sm category-filter"
+            className="border border-gray-300 rounded-lg px-2 shadow-sm category-filter text-sm "
             onClick={() => handleCategoryChange(category.name)}
           >
             {category.name}
@@ -115,9 +168,10 @@ export default function Products() {
         <div className="grid grid-cols-4 gap-6 products-container ">
           {products.map((product) => (
             <div
-
               key={product.id}
-              className={`product border rounded-lg shadow-md flex-col h-[310px] ${product.stock_quantity == 0 ? 'opacity-50' : ''}`}
+              className={`product border rounded-lg shadow-md flex-col h-[310px] ${
+                product.stock_quantity == 0 ? "opacity-50" : ""
+              }`}
             >
               <div className="h-[50%]">
                 <img
@@ -137,7 +191,7 @@ export default function Products() {
                 <button
                   className="add-button mt-auto font-semibold underline text-sm block text-right"
                   onClick={() => addCartItem(product.id)}
-                  disabled={`${product.stock_quantity == 0 ? true: ''}`}
+                  disabled={`${product.stock_quantity == 0 ? true : ""}`}
                 >
                   Add to cart
                 </button>
@@ -146,9 +200,11 @@ export default function Products() {
           ))}
         </div>
       )}
+
+
       {showPopUp && (
         <PopUp
-          onClose={() => navigate('/login')}
+          onClose={() => navigate("/login")}
           message={"You need to login first to add a product in cart"}
           button={"Login"}
         />
