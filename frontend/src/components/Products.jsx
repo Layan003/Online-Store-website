@@ -152,7 +152,7 @@ export default function Products() {
         {category.map((category) => (
           <div
             key={category.name}
-            className="border border-gray-300 rounded-lg px-2 shadow-sm category-filter text-sm "
+            className="border border-gray-300 rounded-lg px-2 shadow-sm category-filter text-sm hover:cursor-pointer "
             onClick={() => handleCategoryChange(category.name)}
           >
             {category.name}

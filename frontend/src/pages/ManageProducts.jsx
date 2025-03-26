@@ -11,7 +11,7 @@ export default function ManageProducts() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const [stock, setStock] = useState(50);
+  const [stock, setStock] = useState(250);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [productId, setProductId] = useState(null)
@@ -91,7 +91,7 @@ export default function ManageProducts() {
           <input
             type="range"
             min="0"
-            max="1000"
+            max="500"
             onChange={(e) => {
               setStock(e.target.value);
               fetchProductByStock();

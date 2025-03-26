@@ -144,7 +144,7 @@ export default function AddNewProduct({setShowAddProduct,fetchProducts}) {
                 <option key={cat.id} value={`${cat.id}`}  onChange={(e) =>
                     setProduct((prev) => ({ ...prev, category: e.target.value }))
                   }>
-                  {cat.name} {cat.id}
+                  {cat.name}
                 </option>
               ))}
             </select>

@@ -137,22 +137,22 @@ export default function CartSummary() {
                   </div> */}
                       {item.product.stock_quantity == 0 ? (
                         <div className="flex items-center shadow-sm bg-gray-100 w-fit h-7 border border-gray-400 rounded-lg">
-                          <div className="count-down px-2">-</div>
+                          <div className="count-down px-2 hover:cursor-pointer">-</div>
                           <div className="px-2">{item.quantity}</div>
-                          <div className="count-up px-2">+</div>
+                          <div className="count-up px-2 hover:cursor-pointer">+</div>
                         </div>
                       ) : (
                         <div className="flex items-center shadow-sm bg-gray-100 w-fit h-7 border border-gray-400 rounded-lg">
                           <div
                             onClick={() => changItemQuantity(item.product.id)}
-                            className="count-down px-2"
+                            className="count-down px-2 hover:cursor-pointer"
                           >
                             -
                           </div>
                           <div className="px-2">{item.quantity}</div>
                           <div
                             onClick={() => addCartItem(item.product.id)}
-                            className="count-up px-2"
+                            className="count-up px-2 hover:cursor-pointer"
                           >
                             +
                           </div>
@@ -175,11 +175,11 @@ export default function CartSummary() {
                           />
                         </svg>
                         {item.product.stock_quantity == 0 ? (
-                          <p className="text-sm text-gray-600">Remove</p>
+                          <p className="text-sm text-gray-600 hover:cursor-pointer">Remove</p>
                         ) : (
                           <p
                             onClick={() => removeCarItem(item.product.id)}
-                            className="text-sm text-gray-600"
+                            className="text-sm text-gray-600 hover:cursor-pointer"
                           >
                             Remove
                           </p>
